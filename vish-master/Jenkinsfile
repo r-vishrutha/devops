@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                  git url: 'https://github.com/ankithlg/vish.git', credentialsId: 'github-token' 
+                  git url: 'https://github.com/r-vishrutha/devops.git', credentialsId: 'github-token' 
             }
         }
 

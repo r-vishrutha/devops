@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'my-frontend-app'   // your Docker image name
-        DOCKER_REGISTRY = 'docker.io/rvishrutha'   // replace with your Docker Hub username
+        DOCKER_IMAGE = 'my-react-app'
+        DOCKER_REGISTRY = 'docker.io/rvishrutha'
     }
 
     stages {
@@ -41,9 +41,12 @@ pipeline {
             }
         }
 
-        stage('Deploy Locally') {
+        stage('Deploy to Kubernetes') {
             steps {
-                bat 'deploy.bat'
+                withCredentials([file(credentialsId: 'kubeconfig-credentials-id', variable: 'KUBECONFIG_FILE')]) {
+                    bat 'kubectl apply --kubeconfig=%KUBECONFIG_FILE% -f flash-deployment.yaml'
+                    bat 'kubectl apply --kubeconfig=%KUBECONFIG_FILE% -f flash-service.yaml'
+                }
             }
         }
     }

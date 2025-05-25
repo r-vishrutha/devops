@@ -29,15 +29,16 @@ pipeline {
         }
 
         stage('Debug Environment') {
-            steps {
-                bat 'docker --version'
-                bat 'docker info'
-                bat 'set HTTP_PROXY'
-                bat 'set HTTPS_PROXY'
-                bat 'set NO_PROXY'
-                bat 'docker pull node:14'
-            }
-        }
+    steps {
+        bat 'docker --version'
+        bat 'docker info'
+        bat 'set HTTP_PROXY || echo HTTP_PROXY not set'
+        bat 'set HTTPS_PROXY || echo HTTPS_PROXY not set'
+        bat 'set NO_PROXY || echo NO_PROXY not set'
+        bat 'docker pull node:14'
+    }
+}
+
 
 
         stage('Build Docker Image') {

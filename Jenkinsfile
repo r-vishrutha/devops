@@ -31,15 +31,24 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image to Docker Hub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    bat 'echo %PASSWORD% | docker login -u %USERNAME% --password-stdin'
-                    bat "docker tag %DOCKER_IMAGE% %DOCKER_REGISTRY%/%DOCKER_IMAGE%:latest"
-                    bat "docker push %DOCKER_REGISTRY%/%DOCKER_IMAGE%:latest"
-                }
-            }
+        stage('Debug Docker Hub Connectivity') {
+    steps {
+        bat 'curl -v https://registry-1.docker.io/v2/'
+          }
         }
+
+
+        stage('Push Docker Image to Docker Hub') {
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+            bat """
+                echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin
+                docker tag ${DOCKER_IMAGE} ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest
+                docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest
+            """
+        }
+    }
+}
 
         stage('Deploy to Kubernetes') {
             steps {

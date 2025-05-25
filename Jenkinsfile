@@ -4,12 +4,10 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'my-react-app'
         DOCKER_REGISTRY = 'docker.io/rvishrutha'
-        // HTTP_PROXY = 'http://your-proxy:port'
-        // HTTPS_PROXY = 'http://your-proxy:port'
-        // NO_PROXY = 'localhost,127.0.0.1,registry-1.docker.io,*.docker.io'
     }
 
     stages {
+
         stage('Clone Repo') {
             steps {
                 git url: 'https://github.com/r-vishrutha/devops.git', credentialsId: 'github-token'
@@ -28,32 +26,13 @@ pipeline {
             }
         }
 
-        stage('Debug Environment') {
-    steps {
-        bat 'docker --version'
-        bat 'docker info'
-        bat 'echo Checking Proxy Environment Variables...'
-        bat 'if defined HTTP_PROXY (echo HTTP_PROXY=%HTTP_PROXY%) else (echo HTTP_PROXY not set)'
-        bat 'if defined HTTPS_PROXY (echo HTTPS_PROXY=%HTTPS_PROXY%) else (echo HTTPS_PROXY not set)'
-        bat 'if defined NO_PROXY (echo NO_PROXY=%NO_PROXY%) else (echo NO_PROXY not set)'
-        bat 'docker pull node:14'
-    }
-}
-
-
-
         stage('Build Docker Image') {
             steps {
+                bat 'docker --version'
+                bat 'docker info'
                 bat "docker build -t %DOCKER_IMAGE% ."
             }
         }
-
-        stage('Debug Docker Hub Connectivity') {
-            steps {
-                bat 'curl -v https://registry-1.docker.io/v2/'
-            }
-        }
-
 
         stage('Push Docker Image to Docker Hub') {
             steps {

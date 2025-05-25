@@ -32,9 +32,10 @@ pipeline {
     steps {
         bat 'docker --version'
         bat 'docker info'
-        bat 'set HTTP_PROXY || echo HTTP_PROXY not set'
-        bat 'set HTTPS_PROXY || echo HTTPS_PROXY not set'
-        bat 'set NO_PROXY || echo NO_PROXY not set'
+        bat 'echo Checking Proxy Environment Variables...'
+        bat 'if defined HTTP_PROXY (echo HTTP_PROXY=%HTTP_PROXY%) else (echo HTTP_PROXY not set)'
+        bat 'if defined HTTPS_PROXY (echo HTTPS_PROXY=%HTTPS_PROXY%) else (echo HTTPS_PROXY not set)'
+        bat 'if defined NO_PROXY (echo NO_PROXY=%NO_PROXY%) else (echo NO_PROXY not set)'
         bat 'docker pull node:14'
     }
 }

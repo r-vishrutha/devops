@@ -3,10 +3,12 @@ kind: Service
 metadata:
   name: flash-service
 spec:
-  type: LoadBalancer
+  type: NodePort           # Changed from LoadBalancer to NodePort
   selector:
     app: flash
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 3000
+      port: 80            # The port you want to expose externally
+      targetPort: 3000    # The port your app listens on inside the pod
+      nodePort: 30036     # NodePort value in the range 30000-32767
+

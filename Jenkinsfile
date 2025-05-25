@@ -67,8 +67,8 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig-credentials-id', variable: 'KUBECONFIG_FILE')]) {
                     bat 'kubectl config use-context minikube --kubeconfig=%KUBECONFIG_FILE%'
-                    bat 'kubectl apply --kubeconfig=%KUBECONFIG_FILE% -f flash-deployment.yaml'
-                    bat 'kubectl apply --kubeconfig=%KUBECONFIG_FILE% -f flash-service.yaml'
+                    bat 'kubectl apply --kubeconfig=%KUBECONFIG_FILE% -f flash-deployment.yaml --validate=false'
+                    bat 'kubectl apply --kubeconfig=%KUBECONFIG_FILE% -f flash-service.yaml --validate=false'
                 }
             }
         }

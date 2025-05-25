@@ -4,6 +4,9 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'my-react-app'
         DOCKER_REGISTRY = 'docker.io/rvishrutha'
+        // HTTP_PROXY = 'http://your-proxy:port'
+        // HTTPS_PROXY = 'http://your-proxy:port'
+        // NO_PROXY = 'localhost,127.0.0.1,registry-1.docker.io,*.docker.io'
     }
 
     stages {
@@ -25,6 +28,18 @@ pipeline {
             }
         }
 
+        stage('Debug Environment') {
+            steps {
+                bat 'docker --version'
+                bat 'docker info'
+                bat 'set HTTP_PROXY'
+                bat 'set HTTPS_PROXY'
+                bat 'set NO_PROXY'
+                bat 'docker pull node:14'
+            }
+        }
+
+
         stage('Build Docker Image') {
             steps {
                 bat "docker build -t %DOCKER_IMAGE% ."
@@ -32,23 +47,21 @@ pipeline {
         }
 
         stage('Debug Docker Hub Connectivity') {
-    steps {
-        bat 'curl -v https://registry-1.docker.io/v2/'
-          }
+            steps {
+                bat 'curl -v https://registry-1.docker.io/v2/'
+            }
         }
 
 
         stage('Push Docker Image to Docker Hub') {
-    steps {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-            bat """
-                echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin
-                docker tag ${DOCKER_IMAGE} ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest
-                docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest
-            """
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    bat 'echo %PASSWORD% | docker login -u %USERNAME% --password-stdin'
+                    bat "docker tag %DOCKER_IMAGE% %DOCKER_REGISTRY%/%DOCKER_IMAGE%:latest"
+                    bat "docker push %DOCKER_REGISTRY%/%DOCKER_IMAGE%:latest"
+                }
+            }
         }
-    }
-}
 
         stage('Deploy to Kubernetes') {
             steps {

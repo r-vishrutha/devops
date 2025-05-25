@@ -49,23 +49,24 @@ del password.txt
         }
 
         stage('Deploy to Kubernetes') {
-            steps {
-                withCredentials([file(credentialsId: 'kubeconfig-credentials-id', variable: 'KUBECONFIG_FILE')]) {
-                    // Use docker-desktop context or change to your desired context
-                    bat 'kubectl config use-context docker-desktop --kubeconfig=%KUBECONFIG_FILE%'
-                    
-                    // Apply deployment and service YAML files
-                    bat 'kubectl apply --kubeconfig=%KUBECONFIG_FILE% -f flash-deployment.yaml --validate=false'
-                    bat 'kubectl apply --kubeconfig=%KUBECONFIG_FILE% -f flash-service.yaml --validate=false'
-
-                    // Optional: check rollout status
-                    bat 'kubectl rollout status deployment/flash-deployment --kubeconfig=%KUBECONFIG_FILE%'
-                    
-                    // Optional: get pods & services info for logs
-                    bat 'kubectl get pods --kubeconfig=%KUBECONFIG_FILE%'
-                    bat 'kubectl get svc --kubeconfig=%KUBECONFIG_FILE%'
-                }
-            }
+    steps {
+        withCredentials([file(credentialsId: 'kubeconfig-credentials-id', variable: 'KUBECONFIG_FILE')]) {
+            // Set the kubeconfig context to docker-desktop
+            bat 'kubectl config use-context docker-desktop --kubeconfig=%KUBECONFIG_FILE%'
+            
+            // Apply deployment and service manifests
+            bat 'kubectl apply -f flash-deployment.yaml --kubeconfig=%KUBECONFIG_FILE%'
+            bat 'kubectl apply -f flash-service.yaml --kubeconfig=%KUBECONFIG_FILE%'
+            
+            // Wait for deployment rollout to complete
+            bat 'kubectl rollout status deployment/flash-deployment --kubeconfig=%KUBECONFIG_FILE%'
+            
+            // Optional: display pods and services for verification
+            bat 'kubectl get pods --kubeconfig=%KUBECONFIG_FILE%'
+            bat 'kubectl get svc --kubeconfig=%KUBECONFIG_FILE%'
         }
+    }
+}
+
     }
 }

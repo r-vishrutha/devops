@@ -22,7 +22,7 @@ pipeline {
 
         stage('Build React App') {
             steps {
-                bat 'npm run build'
+               bat 'set CI=false && npm run build'
             }
         }
 
@@ -37,7 +37,11 @@ pipeline {
         stage('Push Docker Image to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    bat 'echo %PASSWORD% | docker login -u %USERNAME% --password-stdin'
+                   bat """
+echo %PASSWORD% > password.txt
+docker login -u %USERNAME% --password-stdin < password.txt
+del password.txt
+"""
                     bat "docker tag %DOCKER_IMAGE% %DOCKER_REGISTRY%/%DOCKER_IMAGE%:latest"
                     bat "docker push %DOCKER_REGISTRY%/%DOCKER_IMAGE%:latest"
                 }

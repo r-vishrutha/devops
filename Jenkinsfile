@@ -15,10 +15,11 @@ pipeline {
         }
 
         stage('Install Dependencies') {
-            steps {
-                bat 'npm install'
-            }
-        }
+    steps {
+        bat 'set HTTP_PROXY=http://http.docker.internal:3128 && set HTTPS_PROXY=http://http.docker.internal:3128 && npm install'
+    }
+}
+
 
         stage('Build React App') {
             steps {
